@@ -9,8 +9,14 @@ Slot Rename:
   screen to "screen"
   switch to "switch"
 
-if you want to reset the list activate the
-board manualy and type "reset" in the lua chat
+Activate the board manualy and type "help" in the lua chat
+
+List of commands:
+'clear' [clear the databank]
+'dump latest/unknown' [dump the table as JSON in the HTML so you can copy it]
+'remove latest/unknown indice' [remove an entry from one of the table]
+'exit' [exit debug mode]
+
 ]]
 --------------------------------------------
 
@@ -18,14 +24,12 @@ board manualy and type "reset" in the lua chat
 
 unit.hide()
 
-if switch.getState() == 0 then system.print("Debug: on"); return end
-
-local json = require ("dkjson")
+json = require ("dkjson")
 
 local player = database.getPlayer(unit.getMasterPlayerId())
 local knownUser = {"Davemane42"} --Exemple {"User1","User2","User3"}
-local latestList = json.decode(dataBank.getStringValue("latest")) --{{User1, ID, Time, Known},{User2, ID, Time, Known}}
-local unknownList = json.decode(dataBank.getStringValue("unknown")) --{{User1, ID, Time},{User2, ID, Time}}
+latestList = json.decode(dataBank.getStringValue("latest")) --{{User1, ID, Time, Known},{User2, ID, Time, Known}}
+unknownList = json.decode(dataBank.getStringValue("unknown")) --{{User1, ID, Time},{User2, ID, Time}}
 
 if unknownList == nil then unknownList={} end
 if latestList == nil then latestList={} end
@@ -42,6 +46,49 @@ function getTime()
 
     return string.format("%s:%s:%s", hours, minutes, seconds)
 end
+
+function redraw()
+    local latestHTML = ""
+    if latestList ~= {} then
+        for k, v in pairs(latestList) do
+            latestHTML = latestHTML.."<div style=color:"..(v[4] and "green" or "white")..";font-size:4vh>"..string.format("%s %s %s", v[3], v[1], v[2]).."</div>"
+        end
+    end
+
+    local unknownHTML = ""
+    if unknownList ~= {} then
+        for k, v in pairs(unknownList) do
+            unknownHTML = unknownHTML.."<div style=color:red;font-size:4vh>"..string.format("%s %s %s", v[3], v[1], v[2]).."</div>"
+        end
+    end
+
+    screen.setHTML([[
+    <style>
+        .column {
+        float: left;
+        width: 50%;
+        }
+
+        .row:after {
+        content: "";
+        display: table;
+        clear: both;
+        }
+    </style>
+    <div class="row">
+        <div class="column" style="">
+            <h1>Latest detection</h1>
+            ]]..latestHTML..[[
+        </div>
+        <div class="column" style="">
+            <h1>Latest unknown detection</h1>
+            ]]..unknownHTML..[[
+        </div>
+    </div>
+    ]])
+end
+
+if switch.getState() == 0 then system.print("Debug enabled, type 'help' to get a list of commands"); return end
 
 local known = false
 for i, v in pairs(knownUser) do
@@ -65,69 +112,66 @@ end
 table.insert(latestList, 1, {player.name, player.id, getTime(), known})
 dataBank.setStringValue("latest", json.encode(latestList))
 
-local latestHTML = ""
-local unknownHTML = ""
-
-if latestList ~= {} then
-    for k, v in pairs(latestList) do
-        latestHTML = latestHTML.."<div style=color:"..(v[4] and "green" or "white")..";font-size:4vh>"..string.format("%s %s %s", v[3], v[1], v[2]).."</div>"
-    end
-end
-
-if unknownList ~= {} then
-    for k, v in pairs(unknownList) do
-        unknownHTML = unknownHTML.."<div style=color:red;font-size:4vh>"..string.format("%s %s %s", v[3], v[1], v[2]).."</div>"
-    end
-end
-
-screen.setHTML([[
-<style>
-    .column {
-    float: left;
-    width: 50%;
-    }
-
-    .row:after {
-    content: "";
-    display: table;
-    clear: both;
-    }
-</style>
-<div class="row">
-    <div class="column" style="">
-        <h1>Latest detection</h1>
-        ]]..latestHTML..[[
-    </div>
-    <div class="column" style="">
-        <h1>Latest unknown detection</h1>
-        ]]..unknownHTML..[[
-    </div>
-</div>
-]])
+redraw()
 
 switch.deactivate()
 
 --------------------------------------------
 
---------- system.inputText(reset) ---------
+--------- system.inputText(*) ---------
 
-screen.setHTML([[
-<style>
-    .centered {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size:10vh;
-    color:red;
+local arguments = {}
+for word in string.gmatch(text, "%w+") do
+    table.insert(arguments, word)
+end
+
+system.print(json.encode(arguments))
+
+if arguments[1] == "clear" then
+    dataBank.clear()
+    --draw("Data Cleared")
+    system.print("DataBank Cleared")
+    redraw()
+    switch.activate()
+    switch.deactivate()
+elseif arguments[1] == "dump" then
+    if arguments[2] == "latest" then
+        screen.setHTML(json.encode(latestList))
+        system.print("dumped 'latest' table to the screen HTML")
+    elseif arguments[2] == "unknown" then
+        screen.setHTML(json.encode(unknownList))
+        system.print("dumped 'unknown' table to the screen HTML")
+    end
+elseif arguments[1] == "remove" then
+    local i = tonumber(arguments[3])
+    if arguments[2] == "latest" then
+        if i and latestList[i] ~= nil then
+            table.remove(latestList, i)
+            dataBank.setStringValue("latest", json.encode(latestList))
+            system.print("removed #"..i.." in latest")
+            redraw()
+        end
+    elseif arguments[2] == "unknown" then
+        if i and unknownList[i] ~= nil then
+            table.remove(unknownList, i)
+            dataBank.setStringValue("unknown", json.encode(unknownList))
+            system.print("removed #"..i.." in unknown")
+            redraw()
+        end
+    end
+elseif arguments[1] == "exit" then
+    redraw()
+    switch.activate()
+    switch.deactivate()
+elseif arguments[1] == "help" then
+    local help = {
+        "List of commands:",
+        "'clear' [clear the databank]",
+        "'dump latest/unknown' [dump the table as JSON in the HTML so you can copy it]",
+        "'remove latest/unknown indice' [remove an entry from one of the table]",
+        "'exit' [exit debug mode]"
     }
-</style>
-
-<div class="centered">
-    Data Cleared
-</div>
-]])
-
-dataBank.clear()
-switch.activate()
-switch.deactivate()
+    for k, v in pairs(help) do
+        system.print(v)
+    end
+end
