@@ -1,4 +1,5 @@
 --[[
+Player logger Version 1.0
         LINK DIAGRAM
      1way          2way
 Zone ----> Switch <----> Board
