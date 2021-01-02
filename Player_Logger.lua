@@ -57,14 +57,14 @@ function redraw()
     local latestHTML = ""
     if latestList ~= {} then
         for k, v in ipairs(latestList) do
-            latestHTML = latestHTML..'<div class='..(v[4] and '"green"' or '"white"')..'>'..string.format("%s %s %s", v[3], v[1], v[2])..'</div>'
+            latestHTML = latestHTML..'<div class='..(v[4] and '"green"' or '"white"')..'>'..string.format("%s %s %s", v[3], v[1], v[2])..'</div>\n            '
         end
     end
 
     local unknownHTML = ""
     if unknownList ~= {} then
         for k, v in ipairs(unknownList) do
-            unknownHTML = unknownHTML..'<div class="red">'..string.format("%s %s %s", v[3], v[1], v[2])..'</div>'
+            unknownHTML = unknownHTML..'<div class="red">'..string.format("%s %s %s", v[3], v[1], v[2])..'</div>\n            '
         end
     end
 
