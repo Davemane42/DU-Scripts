@@ -9,7 +9,11 @@ Slot Rename:
   screen to "screen"
   switch to "switch"
 
+add yourself to the known user on line 5 of unit.start()
+knownUser = {"My_Username"} --multiple user exemple {"User1","User2","User3"}
+
 Activate the board manualy and type "help" in the lua chat for the command list
+Only known user will be able to type commands
 
 List of commands:
 'clear' [clear the databank]
@@ -26,10 +30,11 @@ unit.hide()
 
 json = require ("dkjson")
 
-local player = database.getPlayer(unit.getMasterPlayerId())
-local knownUser = {} --Exemple {"User1","User2","User3"}
+knownUser = {} -- knownUser = {"User1"} -- multiple user knownUser = {"User1","User2","User3"}
+player = database.getPlayer(unit.getMasterPlayerId())
 latestList = json.decode(dataBank.getStringValue("latest")) --{{User1, ID, Time, Known},{User2, ID, Time, Known}}
 unknownList = json.decode(dataBank.getStringValue("unknown")) --{{User1, ID, Time},{User2, ID, Time}}
+known = false
 
 if unknownList == nil then unknownList={} end
 if latestList == nil then latestList={} end
@@ -88,13 +93,17 @@ function redraw()
     ]])
 end
 
-if switch.getState() == 0 then system.print("Debug enabled, type 'help' to get a list of commands"); return end
-
-local known = false
 for i, v in pairs(knownUser) do
     if player.name == v then
         known = true
     end
+end
+
+if switch.getState() == 0 then
+    if known then
+        system.print("Debug enabled, type 'help' to get a list of commands")
+    end
+    return
 end
 
 if known == false then
@@ -119,6 +128,8 @@ switch.deactivate()
 --------------------------------------------
 
 --------- system.inputText(*) ---------
+
+if known == false then system.print("UNKNOWN USER CANNOT INPUT COMMAND"); return end
 
 local arguments = {}
 for word in string.gmatch(text, "%w+") do
@@ -163,7 +174,6 @@ elseif arguments[1] == "exit" then
     switch.deactivate()
 elseif arguments[1] == "help" then
     local help = {
-        "List of commands:",
         "'clear' [clear the databank]",
         "'dump latest/unknown' [dump the table as JSON in the HTML so you can copy it]",
         "'remove latest/unknown indice' [remove an entry from one of the table]",
