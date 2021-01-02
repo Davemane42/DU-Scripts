@@ -55,15 +55,15 @@ end
 function redraw()
     local latestHTML = ""
     if latestList ~= {} then
-        for k, v in pairs(latestList) do
-            latestHTML = latestHTML.."<div style=color:"..(v[4] and "green" or "white")..";font-size:4vh>"..string.format("%s %s %s", v[3], v[1], v[2]).."</div>"
+        for k, v in ipairs(latestList) do
+            latestHTML = latestHTML..'<div class='..(v[4] and '"green"' or '"white"')..'>'..string.format("%s %s %s", v[3], v[1], v[2])..'</div>'
         end
     end
 
     local unknownHTML = ""
     if unknownList ~= {} then
-        for k, v in pairs(unknownList) do
-            unknownHTML = unknownHTML.."<div style=color:red;font-size:4vh>"..string.format("%s %s %s", v[3], v[1], v[2]).."</div>"
+        for k, v in ipairs(unknownList) do
+            unknownHTML = unknownHTML..'<div class="red">'..string.format("%s %s %s", v[3], v[1], v[2])..'</div>'
         end
     end
 
@@ -72,6 +72,10 @@ function redraw()
         .column {
         float: left;
         width: 50%;
+        font-size:4vh;
+        line-height:4vh;
+        font-weight:bold;
+        font-family:Montserrat;
         }
 
         .row:after {
@@ -79,17 +83,31 @@ function redraw()
         display: table;
         clear: both;
         }
+
+        .white {
+        color:white;
+        }
+
+        .red {
+        color:red;
+        }
+
+        .green {
+        color:green;
+        }
+
     </style>
     <div class="row">
         <div class="column" style="">
-            <h1>Latest detection</h1>
+            <h1 style=font-size:4vh;>Latest detection</h1>
             ]]..latestHTML..[[
         </div>
         <div class="column" style="">
-            <h1>Latest unknown detection</h1>
+            <h1 style=font-size:4vh;>Latest unknown detection</h1>
             ]]..unknownHTML..[[
         </div>
     </div>
+    <div style=position:absolute;bottom:0;right:0;color:red;font-size:2vh;font-weight:bold;font-family:Montserrat;padding-right:1vh;>Version 1.0</div>
     ]])
 end
 
