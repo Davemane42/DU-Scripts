@@ -9,7 +9,7 @@ Slot Rename:
   screen to "screen"
   switch to "switch"
 
-Activate the board manualy and type "help" in the lua chat
+Activate the board manualy and type "help" in the lua chat for the command list
 
 List of commands:
 'clear' [clear the databank]
@@ -27,7 +27,7 @@ unit.hide()
 json = require ("dkjson")
 
 local player = database.getPlayer(unit.getMasterPlayerId())
-local knownUser = {"Davemane42"} --Exemple {"User1","User2","User3"}
+local knownUser = {} --Exemple {"User1","User2","User3"}
 latestList = json.decode(dataBank.getStringValue("latest")) --{{User1, ID, Time, Known},{User2, ID, Time, Known}}
 unknownList = json.decode(dataBank.getStringValue("unknown")) --{{User1, ID, Time},{User2, ID, Time}}
 
@@ -125,12 +125,10 @@ for word in string.gmatch(text, "%w+") do
     table.insert(arguments, word)
 end
 
-system.print(json.encode(arguments))
-
 if arguments[1] == "clear" then
     dataBank.clear()
-    --draw("Data Cleared")
     system.print("DataBank Cleared")
+    latestList, unknownList = {}, {}
     redraw()
     switch.activate()
     switch.deactivate()
