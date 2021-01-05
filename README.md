@@ -6,16 +6,19 @@
 
 Log player activity to a DataBank and render to a screen
 
-**List of elements needed**
-* 1x Programming board
-* 1x Detection zone
-* 1x Data Bank
-* 1x Screen
-* 1x Manual Switch
-
-<details open="open">
+<details close="close">
   <summary>Instalation:</summary>
   <ul>
+    <details close="close">
+      <summary>Elements needed:</summary>
+      <ul>
+        <li>1x Programming board</li>
+        <li>1x Detection zone</li>
+        <li>1x Data Bank</li>
+        <li>1x Screen</li>
+        <li>1x Manual Switch</li>
+      </ul>
+    </details>
     <li><p>Copy the content of this <a href="https://raw.githubusercontent.com/Davemane42/DU-Scripts/master/Player_Logger.json">link</a> and paste on a programming board</p></li>
     <li><p>Connnect the board to the screen.
     </br>Then do the same for the data bank.
@@ -32,4 +35,17 @@ Log player activity to a DataBank and render to a screen
 Display all ores in the connected container.
 refreshes every 30 sec
 
-**Instalation:** Copy the content of this [**link**](https://raw.githubusercontent.com/Davemane42/DU-Scripts/master/OreDisplay.json) and paste on a programming board. Then use the link tool and connect it to a container/ container hub
+<details close="close">
+  <summary>Instalation:</summary>
+  <ul>
+    <details close="close">
+      <summary>Elements needed:</summary>
+      <ul>
+        <li>1x Programming board</li>
+        <li>1x Container / ContainerHub</li>
+      </ul>
+    </details>
+    <li><p>Copy the content of this <a href="https://raw.githubusercontent.com/Davemane42/DU-Scripts/master/OreDisplay.json">link</a> and paste on a programming board</p></li>
+    <li><p>Connnect the board to the container / ContainerHub.
+  </ul>
+</details>
