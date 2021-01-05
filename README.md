@@ -4,7 +4,19 @@
 
 ![PlayerLogger](https://github.com/Davemane42/DU-Scripts/blob/master/images/Player_Logger.png?raw=true)
 
-Log player activity to a DataBank and render to a screen
+Log player activity to a DataBank and display to a screen.
+useful lua channel commands for user interaction
+
+<details close="close">
+  <summary>List of commands:</summary>
+  <ul>
+    <li>'clear' [clear the databank]</li>
+    <li>'dump latest/unknown' [dump the table as JSON in the HTML so you can copy it]</li>
+    <li>'remove latest/unknown indice' [remove an entry from one of the table]</li>
+    <li>'exit' [exit debug mode]</li>
+    <li>'help' display a list of commands</li>
+  </ul>
+</details>
 
 <details close="close">
   <summary>Instalation:</summary>
