@@ -41,7 +41,8 @@ useful lua channel commands for user interaction
 </details>
 
 ## Ore Display
-
+<H2 style=color:red;>This script is useless due to ingame limitation. left it here so people can look at the code</H2>
+  
 ![PlayerLogger](https://github.com/Davemane42/DU-Scripts/blob/master/images/Ore_Display.png?raw=true)
 
 Display all ores in the connected container.
