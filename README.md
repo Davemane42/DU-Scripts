@@ -38,6 +38,12 @@ Activate the board manualy and type "help" in the lua chat for the command list
     <li>'help' display a list of commands</li>
   </ul>
 </details>
+<details close="close">
+<summary>Known Issue:</summary>
+  <ul>
+    <li>Detection zone needs to be at least 3m away from the programing board for "ignoreKnown = false" to work</li>
+  </ul>
+</details>
 
 ## Ore Display
 
