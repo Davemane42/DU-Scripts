@@ -4,8 +4,9 @@
 
 ![PlayerLogger](https://github.com/Davemane42/DU-Scripts/blob/master/images/PlayerLogger.png?raw=true)
 
-Log player activity to a DataBank and render to a screen
+Log player activity to a DataBank and render to a screen<br />
 Support about 175 entry before you need to clear the DataBank
+
 
 <details close="close">
   <summary>Instalation:</summary>
@@ -16,7 +17,7 @@ Support about 175 entry before you need to clear the DataBank
         <li>1x Programming board</li>
         <li>1x Data Bank</li>
         <li>1x Screen</li>
-		<li>1x Detection zone</li>
+	<li>1x Detection zone</li>
       </ul>
     </details>
     <li><p>Copy the content of this <a href="https://raw.githubusercontent.com/Davemane42/DU-Scripts/master/PlayerLogger/PlayerLogger2.0.json">link</a> and paste on a programming board</p></li>
@@ -26,7 +27,7 @@ Support about 175 entry before you need to clear the DataBank
     <li><p>Finnaly, hit ctrl+L while looking at the board and add your username in line 7 of unit->start() </p></li>
   </ul>
 </details>
-
+Activate the board manualy and type "help" in the lua chat for the command list
 <details close="close">
   <summary>List of commands:</summary>
   <ul>
