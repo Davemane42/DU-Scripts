@@ -3,9 +3,9 @@ unit.hide()
 json = require ("dkjson")
 vec3 = require("cpml/vec3")
 
-location = "location" --export: Name of the Location
+location = "Lobby" --export: Name of the Location
 knownUser = {} -- knownUser = {"User1"} -- multiple user knownUser = {"User1","User2","User3"}
-ignoreKnown = false --export: Doesn't display known user(s) to prevent screen flooding
+ignoreKnown = true --export: Doesn't display known user(s) to prevent screen flooding
 
 player = database.getPlayer(unit.getMasterPlayerId())
 latestList = json.decode(dataBank.getStringValue("latest"))
