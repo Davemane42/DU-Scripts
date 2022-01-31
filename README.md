@@ -22,14 +22,15 @@ Tested with 1300 entries with 8 databanks
 	<li>1 to 8 Databank(s)</li>
       </ul>
     </details>
-    <li><p>Copy the content of this <a href="https://raw.githubusercontent.com/Davemane42/DU-Scripts/master/PlayerLogger/PlayerLogger3.2.json">link</a> and paste on a programming board</p></li>
+    <li>Copy the content of this <a href="https://raw.githubusercontent.com/Davemane42/DU-Scripts/master/PlayerLogger/PlayerLogger3.2.json">link</a></li>
+      <ul><li>Right click (on the programming board) -> Advanced -> Paste Lua configuration from clipboard</li></ul>
     <li>Connect Detection zone -> Manual Switch -> Programming Board -> Manual Switch (both way)</li>
-    <ul><li><p>For multiple detection zone: add an "OR operator"
-      </br>(only 1 needed) in between Detection zones and the Manual Switch</p></li></ul>
-    <li>Then do the same for the databank(s) and screen .</li>
-    <li><p>Finnaly, hit ctrl+L while looking at the board
+    <ul><li>For multiple detection zone: add an "OR operator" between the Detection zones and the Manual Switch
+      </br>(only 1 needed) in between the zones and switch</li></ul>
+    <li>Then Programming Board -> databank(s) and screen</li>
+    <li>Finnaly, hit ctrl+L while looking at the board
       </br>add your username in line 7 of unit.start()
-      </br>rename the location to your liking</p></li>  
+      </br>rename the location to your liking</li>  
   </ul>
 </details>
 Activate the board manualy and type "help" in the lua chat for the command list
@@ -50,6 +51,36 @@ Activate the board manualy and type "help" in the lua chat for the command list
     <li></li>
     <li></li>
     <li></li>
+  </ul>
+</details>
+
+## Restricted Access Door script
+
+![PlayerLogger](https://github.com/Davemane42/DU-Scripts/blob/master/images/RestrictedDoor.png?raw=true)
+
+Restric access to certain zones via "locked door"
+
+<details close="close">
+  <summary>Instalation:</summary>
+  <ul>
+    <details close="close">
+      <summary>Elements needed:</summary>
+      <ul>
+        <li>1x Programming board</li>
+	<li>1x Detection zone</li>
+	<li>1x Screen (minimum)</li>
+	  <ul><li>Supports multiple screens</li></ul>
+      </ul>
+    </details>
+    <li>Copy the content of this <a href="https://raw.githubusercontent.com/Davemane42/DU-Scripts/master/RestrictedAccessDoor/RestrictedAccessDoor1.0.json">link</a></li>
+      <ul><li>Right click (on the programming board) -> Advanced -> Paste Lua configuration from clipboard</li></ul>
+    <li>Connect Detection zone -> Programming Board</li>
+    <li>Then Programming Board -> Door and Screen(s)</li>
+    <li>Finnaly, edit the lua parameters (Right click -> Advanced -> Edit Lua Parameters)
+      </br>Add your username between the quotes ""
+	<ul><li>"Davemane42"</li></ul>
+      For multiple user. add comma , between names and no spaces
+	<ul><li>"Davemane42,User2,User3"</li></ul></li>
   </ul>
 </details>
 
