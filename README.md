@@ -53,6 +53,7 @@ Activate the board manualy and type "help" in the lua chat for the command list
     <li></li>
   </ul>
 </details>
+Dont forget to like on <a href="https://du-creators.org/makers/Davemane42/ship/Player%20Logger">du-creators</a> 👍
 
 ## Restricted Access Door script
 
@@ -83,6 +84,7 @@ Restric access to certain zones via "locked door"
 	<ul><li>"Davemane42,User2,User3"</li></ul></li>
   </ul>
 </details>
+Dont forget to like on <a href="https://du-creators.org/makers/Davemane42/ship/Restricted%20Access%20Door">du-creators</a> 👍
 
 ## Ore Display
 
