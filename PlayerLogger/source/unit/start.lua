@@ -5,9 +5,11 @@ unit.hide()
 
 location = "Lobby" -- Name of the Location
 knownUser = {""} -- knownUser = {"User1"} -- multiple user knownUser = {"User1","User2","User3"}
-ignoreKnown = false -- Doesn't display known user(s) to prevent screen flooding
+ignoreKnown = true -- Doesn't display known user(s) to prevent screen flooding
+mergeLastDay = true -- if the player was seen in the last 24h, delete the old one
+mergeLastDayCount = 25 -- search the last x entries for the 'mergeLastDay' setting
 
-version = "3.3"
+version = "3.4"
 
 logData = {}
 player = database.getPlayer(unit.getMasterPlayerId())
@@ -133,9 +135,9 @@ function loadData()
 end
 
 -- Get curent time in dd/mm/yy h:m:s
-function getTime()
-    local hoursOffset = 0
-    local unixTime = math.floor(system.getTime() + 1506729600) - (60*60*(hoursOffset or 0)) --(Oct. 1, 2017, at 00:00) //1506729600 //1506816000
+function getTime(hoursOffset)
+    local hoursOffset = hoursOffset or 0
+    local unixTime = math.floor(system.getTime() + 1506729600) + (60*60*hoursOffset) --(Oct. 1, 2017, at 00:00) //1506729600 //1506816000
 
     local hours = math.floor(unixTime / 3600 % 24)
     local minutes = math.floor(unixTime / 60 % 60)
@@ -343,6 +345,8 @@ if dataBanks[1].getStringValue("screenVer") ~= version then
     loadScreenCode()
 end
 
+saveData('[["ZarTaen",33437,"01/02/22 19:21:50",false],["KiyaStarcherry",89846,"31/01/22 03:02:44",false],["DrRapster",102704,"22/01 19:14:33",false],["Northwind",98386,"02/01 11:32:58",false],["Starfury",75850,"24/12 11:08:27",false],["Nakmor",97912,"22/12 11:48:26",false],["bob6416472",100740,"28/10 14:39:52",false],["Davemane42",34488,"07/02/22 14:39:52",false]]')
+
 logData = loadData()
 
 -- Is current player in the knownUser list
@@ -367,10 +371,24 @@ if unit.getSignalIn('in')==0 then
 end
 
 if (known and ignoreKnown) == false then
-    if logData[1] ~= nil then
-        if player.name == logData[1][1] then
+
+    if #logData > 0 then
+        if player.id == logData[1][2] then
             system.print(string.format("Deleting repeating entry of %s", logData[1][1]))
             table.remove(logData, 1)
+        elseif mergeLastDay then
+            local limit = #logData > mergeLastDayCount and mergeLastDayCount or #logData
+            local pastTimeString = string.match(getTime(-24), '([%d/]+)')
+            for i=1, limit do
+                if player.id == logData[i][2] then
+                    local timeString = string.match(logData[i][3], '([%d/]+)')
+                    if timeString == pastTimeString then
+                        system.print(string.format("Deleting past entry of %s from %s", logData[i][1], timeString))
+                        table.remove(logData, i)
+                        break
+                    end
+                end
+            end
         end
     end
 
