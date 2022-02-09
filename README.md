@@ -22,7 +22,7 @@ Tested with 1300 entries with 8 databanks
 	<li>1 to 8 Databank(s)</li>
       </ul>
     </details>
-    <li>Copy the content of this <a href="https://raw.githubusercontent.com/Davemane42/DU-Scripts/master/PlayerLogger/PlayerLogger3.2.json">link</a></li>
+    <li>Copy the content of this <a href="https://raw.githubusercontent.com/Davemane42/DU-Scripts/master/PlayerLogger/PlayerLogger.json">link</a></li>
       <ul><li>Right click (on the programming board) -> Advanced -> Paste Lua configuration from clipboard</li></ul>
     <li>Connect Detection zone -> Manual Switch -> Programming Board -> Manual Switch (both way)</li>
     <ul><li>For multiple detection zone: add an "OR operator" between the Detection zones and the Manual Switch
