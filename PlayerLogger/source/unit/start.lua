@@ -9,7 +9,7 @@ ignoreKnown = true -- Doesn't display known user(s) to prevent screen flooding
 mergeLastDay = true -- if the player was seen in the last 24h, delete the old one
 mergeLastDayCount = 25 -- search the last x entries for the 'mergeLastDay' setting
 
-version = "3.4"
+version = "3.5"
 
 logData = {}
 player = database.getPlayer(unit.getMasterPlayerId())
@@ -137,7 +137,7 @@ end
 -- Get curent time in dd/mm/yy h:m:s
 function getTime(hoursOffset)
     local hoursOffset = hoursOffset or 0
-    local unixTime = math.floor(system.getTime() + 1506729600) + (60*60*hoursOffset) --(Oct. 1, 2017, at 00:00) //1506729600 //1506816000
+    local unixTime = math.floor(system.getUtcTime()) + (3600*hoursOffset) --(Oct. 1, 2017, at 00:00) //1506729600 //1506816000
 
     local hours = math.floor(unixTime / 3600 % 24)
     local minutes = math.floor(unixTime / 60 % 60)
@@ -188,7 +188,7 @@ local font = loadFont('FiraMono', 20)
 local fontAH, fontDH = getFontMetrics(font)
 
 -- Set default text color to red
-setDefaultFillColor(layer, 6, 1, 0, 0, 1)
+setDefaultFillColor(layer, Shape_Text, 1, 0, 0, 1)
 
 if not init then
     init = true
@@ -344,8 +344,6 @@ screen.clearScriptOutput()
 if dataBanks[1].getStringValue("screenVer") ~= version then
     loadScreenCode()
 end
-
-saveData('[["ZarTaen",33437,"01/02/22 19:21:50",false],["KiyaStarcherry",89846,"31/01/22 03:02:44",false],["DrRapster",102704,"22/01 19:14:33",false],["Northwind",98386,"02/01 11:32:58",false],["Starfury",75850,"24/12 11:08:27",false],["Nakmor",97912,"22/12 11:48:26",false],["bob6416472",100740,"28/10 14:39:52",false],["Davemane42",34488,"07/02/22 14:39:52",false]]')
 
 logData = loadData()
 
