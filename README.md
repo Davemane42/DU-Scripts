@@ -73,7 +73,7 @@ Restric access to certain zones via "locked door"
 	  <ul><li>Supports multiple screens</li></ul>
       </ul>
     </details>
-    <li>Copy the content of this <a href="https://raw.githubusercontent.com/Davemane42/DU-Scripts/master/RestrictedAccessDoor/RestrictedAccessDoor1.0.json">link</a></li>
+    <li>Copy the content of this <a href="https://raw.githubusercontent.com/Davemane42/DU-Scripts/master/RestrictedAccessDoor/RestrictedAccessDoor.json">link</a></li>
       <ul><li>Right click (on the programming board) -> Advanced -> Paste Lua configuration from clipboard</li></ul>
     <li>Connect Detection zone -> Programming Board</li>
     <li>Then Programming Board -> Door and Screen(s)</li>
