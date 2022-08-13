@@ -1,27 +1,21 @@
 ----------
 -- INIT --
 ----------
-unit.hide()
+unit.hideWidget()
 
-location = "Lobby" -- Name of the Location
-knownUser = {""} -- knownUser = {"User1"} -- multiple user knownUser = {"User1","User2","User3"}
-ignoreKnown = true -- Doesn't display known user(s) to prevent screen flooding
-mergeLastDay = true -- if the player was seen in the last 24h, delete the old one
-mergeLastDayCount = 25 -- search the last x entries for the 'mergeLastDay' setting
+-- knownUser = "User1"
+-- knownUser = "User1,User2,User3"
+knownUser = "" --export Keep the list between quotes '' and no spaces ex: 'Davemane42,User2'
+knownOrg = "" --export Keep the list between quotes '' and no spaces around the names ex: "The Prospectors,Org Name2"
+ignoreKnown = true --export Doesn't display known user(s) to prevent screen flooding
 
-version = "3.5"
+location = "Lobby" --export Keep between quotes ''
 
-logData = {}
-player = database.getPlayer(unit.getMasterPlayerId())
+mergeLastDay = true --export if the player was seen in the last 24h, delete the old one
+mergeLastDayCount = 25 --export search the last x entries for the 'mergeLastDay' setting
 known = false
-
-comState = nil
-loadBuffer = nil
-exit = false
-
-system.print("-----------------------------------------------")
-system.print("Player Logger v"..version.." by Davemane42")
-system.print("-----------------------------------------------")
+mode = ""
+version = "4.0"
 
 ---------------
 -- Functions --
@@ -166,7 +160,7 @@ function getTime(hoursOffset)
 end
 
 -----------------
--- screen code --
+-- Screen Code --
 -----------------
 
 -- Update screen code if the version get changed
@@ -294,14 +288,14 @@ screen = nil
 switch = nil
 for slot_name, slot in pairs(unit) do
     if type(slot) == "table" and type(slot.export) == "table" and slot.getElementClass then
-        if slot.getElementClass():lower() == 'databankunit' then
+        if slot.getClass():lower() == 'databankunit' then
             slot.slotname = slot_name
             table.insert(dataBanks,slot)
         end
-        if slot.getElementClass():lower() == 'screenunit' then
+        if slot.getClass():lower() == 'screenunit' then
             screen = slot
         end
-        if slot.getElementClass():lower() == 'manualswitchunit' then
+        if slot.getClass():lower() == 'manualswitchunit' then
             switch = slot
         end
     end
@@ -330,6 +324,7 @@ end
 
 if flag then
     unit.exit()
+    switch.deactivate()
     return
 end
 
@@ -347,10 +342,26 @@ end
 
 logData = loadData()
 
--- Is current player in the knownUser list
-for i, v in pairs(knownUser) do
-    if player.name == v then
-        known = true
+-- Convert knownUser CSV to a table
+playerData = database.getPlayer(player.getId())
+if knownUser ~= "" then
+    for name in string.gmatch(knownUser, "([^,]+)") do
+        if playerData.name == name then
+            known = true
+        end
+    end
+end
+
+-- Convert knownOrg CSV to a table
+orgList = player.getOrgIds()
+if knownOrg ~= "" and #orgList>0 then
+    for name in string.gmatch(knownOrg, "([^,]+)") do
+        -- Look trough master player orgs
+        for k, v in pairs(orgList) do
+            if database.getOrganization(v).name == name then
+                known = true
+            end
+        end
     end
 end
 
@@ -371,14 +382,14 @@ end
 if (known and ignoreKnown) == false then
 
     if #logData > 0 then
-        if player.id == logData[1][2] then
+        if playerData.id == logData[1][2] then
             system.print(string.format("Deleting repeating entry of %s", logData[1][1]))
             table.remove(logData, 1)
         elseif mergeLastDay then
             local limit = #logData > mergeLastDayCount and mergeLastDayCount or #logData
             local pastTimeString = string.match(getTime(-24), '([%d/]+)')
             for i=1, limit do
-                if player.id == logData[i][2] then
+                if playerData.id == logData[i][2] then
                     local timeString = string.match(logData[i][3], '([%d/]+)')
                     if timeString == pastTimeString then
                         system.print(string.format("Deleting past entry of %s from %s", logData[i][1], timeString))
@@ -390,7 +401,7 @@ if (known and ignoreKnown) == false then
         end
     end
 
-    table.insert(logData, 1, {player.name, player.id, getTime(), known})
+    table.insert(logData, 1, {playerData.name, playerData.id, getTime(), known})
     saveData()
 end
 

@@ -27,4 +27,4 @@ if output ~= "" then
     end
 end
 
-if exit and comState == nil then unit.exit() switch.deactivate() end
+if exit and comState == nil then switch.deactivate() unit.exit() end

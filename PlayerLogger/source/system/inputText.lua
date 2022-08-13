@@ -3,21 +3,31 @@ if known == false then system.print("UNKNOWN USER CANNOT INPUT COMMAND"); return
 
 local arguments = {}
 for word in string.gmatch(text, "%w+") do
-    table.insert(arguments, word)
+    table.insert(arguments, word:lower())
+end
+
+if mode == "clear" then
+    mode = ""
+    if arguments[1] == "yes" then
+       for k,v in pairs(dataBanks) do
+            v.setStringValue ("logData", "")
+        end
+
+        logData = {}
+        screen.clearScriptOutput()
+        loadScreenData()
+
+        system.print("DataBank Cleared")
+        exit=true
+        return
+    else
+        system.print("")
+    end
 end
 
 if arguments[1] == "clear" then
-
-    for k,v in pairs(dataBanks) do
-        v.setStringValue ("logData", "")
-    end
-
-    logData = {}
-    screen.clearScriptOutput()
-    loadScreenData()
-
-    system.print("DataBank Cleared")
-    exit=true
+    mode = "clear"
+    system.print(string.format("Type 'yes' to confirm deleting %s %s", #logData, #logData > 1 and  "Entries" or "Entry"))
 elseif arguments[1] == "dump" then
     system.print("")
     if #logData > 0 then
