@@ -1,4 +1,4 @@
-unit.hide()
+unit.hideWidget()
 
 -- knownUser = "User1"
 -- knownUser = "User1,User2,User3"
@@ -6,21 +6,21 @@ knownUser = "" --export Keep the list between quotes '' and no spaces ex: 'Davem
 knownOrg = "" --export Keep the list between quotes '' and no spaces around the names ex: "The Prospectors,Org Name2"
 location = "Lobby" --export Keep between quotes ''
 
-version = "1.2"
-player = database.getPlayer(unit.getMasterPlayerId())
+version = "1.3"
+playerData = database.getPlayer(player.getId())
 known = false
 
 -- Convert knownUser CSV to a table
 if knownUser ~= "" then
     for name in string.gmatch(knownUser, "([^,]+)") do
-        if player.name == name then
+        if playerData.name == name then
             known = true
         end
     end
 end
 
 -- Convert knownOrg CSV to a table
-orgList = unit.getMasterPlayerOrgIds()
+orgList = player.getOrgIds()
 if knownOrg ~= "" and #orgList>0 then
     for name in string.gmatch(knownOrg, "([^,]+)") do
         -- Look trough master player orgs
@@ -36,8 +36,8 @@ end
 screens = {}
 door = nil
 for slot_name, slot in pairs(unit) do
-    if type(slot) == "table" and type(slot.export) == "table" and slot.getElementClass then
-        local elementClass = slot.getElementClass():lower()
+    if type(slot) == "table" and type(slot.export) == "table" and slot.getClass then
+        local elementClass = slot.getClass():lower()
         if elementClass == "screenunit" then
             slot.slotname = slot_name
             table.insert(screens, slot)
@@ -52,15 +52,15 @@ if door == nil then
     return
 end
 
-if known then door.activate() else door.deactivate() end
+if known then door.open() else door.close() end
 
 if #screens ~= 0 then
     for k, screen in pairs(screens) do
-        screen.setScriptInput(string.format("%s %s", known, player.name))
+        screen.setScriptInput(string.format("%s %s", known, playerData.name))
         screen.activate()
 
         -- Screen code
-        if screen.getScriptOutput() ~= version then
+        if screen.getScriptOutput() ~= string.format("%s %s", version, location) then
             screen.setRenderScript([[
 local layer = createLayer()
 local rx, ry = getResolution()
@@ -69,7 +69,7 @@ local time = getTime()
 local version = "]]..version..[["
 local location = "]]..location..[["
 
-setOutput(version)
+setOutput(string.format("%s %s", version, location))
 
 local input = getInput()
 

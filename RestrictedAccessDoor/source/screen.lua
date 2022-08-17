@@ -5,7 +5,7 @@ local time = getTime()
 local version = "1.2"
 local location = "Lobby"
 
-setOutput(version)
+setOutput(string.format("%s %s", version, location))
 
 local input = getInput()
 
@@ -97,4 +97,3 @@ else
         addText(layer, font, v, rx/2, ry/2 - ((#text-1)/2)*size + (k-1)*size)
     end
 end
-                
