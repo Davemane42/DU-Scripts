@@ -6,7 +6,7 @@ knownUser = "" --export Keep the list between quotes '' and no spaces ex: 'Davem
 knownOrg = "" --export Keep the list between quotes '' and no spaces around the names ex: "The Prospectors,Org Name2"
 location = "Lobby" --export Keep between quotes ''
 
-version = "1.3"
+version = "1.4"
 playerData = database.getPlayer(player.getId())
 known = false
 
@@ -34,7 +34,7 @@ end
 
 -- Loop trough slots and get the screen(s) and door
 screens = {}
-door = nil
+doors = {}
 for slot_name, slot in pairs(unit) do
     if type(slot) == "table" and type(slot.export) == "table" and slot.getClass then
         local elementClass = slot.getClass():lower()
@@ -42,17 +42,34 @@ for slot_name, slot in pairs(unit) do
             slot.slotname = slot_name
             table.insert(screens, slot)
         elseif elementClass:find("door") or elementClass == "airlock" or elementClass == "gate" then
-            door = slot
+            slot.slotname = slot_name
+            table.insert(doors, slot)
         end
     end
 end
-if door == nil then
+if #doors == 0 then
     system.print("Missing a door, exiting")
     unit.exit()
     return
 end
 
-if known then door.open() else door.close() end
+function doorsState(state)
+    if #doors ~= 0 then
+        for k, door in pairs(doors) do
+            if state == "open" then
+                door.open()
+            elseif state == "close" then
+                door.close()
+            end
+        end
+    end
+end
+
+if known then 
+    doorsState("open")
+else 
+    doorsState("close")
+end
 
 if #screens ~= 0 then
     for k, screen in pairs(screens) do
@@ -60,7 +77,7 @@ if #screens ~= 0 then
         screen.activate()
 
         -- Screen code
-        if screen.getScriptOutput() ~= string.format("%s %s", version, location) then
+        if screen.getScriptOutput() ~= string.format("%s %s", version, location) then   
             screen.setRenderScript([[
 local layer = createLayer()
 local rx, ry = getResolution()
@@ -72,7 +89,7 @@ local location = "]]..location..[["
 setOutput(string.format("%s %s", version, location))
 
 local input = getInput()
-
+                
 if input ~= "" then
     local arguments = {}
     for word in string.gmatch(input, "%w+") do

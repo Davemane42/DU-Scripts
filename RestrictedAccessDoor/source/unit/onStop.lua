@@ -1,4 +1,4 @@
-door.close()
+doorsState("close")
 
 if #screens ~= 0 then
     for k, screen in pairs(screens) do
