@@ -6,7 +6,7 @@ knownUser = "" --export Keep the list between quotes '' and no spaces ex: 'Davem
 knownOrg = "" --export Keep the list between quotes '' and no spaces around the names ex: "The Prospectors,Org Name2"
 location = "Lobby" --export Keep between quotes ''
 
-version = "1.4"
+version = "1.5"
 playerData = database.getPlayer(player.getId())
 known = false
 
@@ -41,7 +41,7 @@ for slot_name, slot in pairs(unit) do
         if elementClass == "screenunit" then
             slot.slotname = slot_name
             table.insert(screens, slot)
-        elseif elementClass:find("door") or elementClass == "airlock" or elementClass == "gate" then
+        elseif elementClass:find("door") or elementClass == "airlock" or elementClass == "gate" or elementClass == "forcefieldunit" then
             slot.slotname = slot_name
             table.insert(doors, slot)
         end
@@ -56,18 +56,27 @@ end
 function doorsState(state)
     if #doors ~= 0 then
         for k, door in pairs(doors) do
+            local elementClass = door.getClass():lower()
             if state == "open" then
-                door.open()
+                if elementClass == "forcefieldunit" then
+                    door.retract()
+                else
+                    door.open()
+                end
             elseif state == "close" then
-                door.close()
+                if elementClass == "forcefieldunit" then
+                    door.deploy()
+                else
+                    door.close()
+                end
             end
         end
     end
 end
 
-if known then 
+if known then
     doorsState("open")
-else 
+else
     doorsState("close")
 end
 
@@ -77,7 +86,7 @@ if #screens ~= 0 then
         screen.activate()
 
         -- Screen code
-        if screen.getScriptOutput() ~= string.format("%s %s", version, location) then   
+        if screen.getScriptOutput() ~= string.format("%s %s", version, location) then
             screen.setRenderScript([[
 local layer = createLayer()
 local rx, ry = getResolution()
@@ -89,7 +98,7 @@ local location = "]]..location..[["
 setOutput(string.format("%s %s", version, location))
 
 local input = getInput()
-                
+
 if input ~= "" then
     local arguments = {}
     for word in string.gmatch(input, "%w+") do
