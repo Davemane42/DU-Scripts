@@ -1,99 +1,89 @@
 local layer = createLayer()
 local rx, ry = getResolution()
 local time = getTime()
-
-local version = "1.2"
-local location = "Lobby"
-
-setOutput(string.format("%s %s", version, location))
-
 local input = getInput()
+
+local version = "2.0"
+local location = ""
+local colorHash = 2262
+local standbyTextColor = {192, 203, 220}
+local standbyBackgroundColor = {24, 20, 37}
+local knownTextColor = {192, 203, 220}
+local knownBackgroundColor = {24, 20, 37}
+local unknownTextColor = {192, 203, 220}
+local unknownBackgroundColor = {255, 0, 0}
+
+setOutput(string.format("%s %s %s", version, location, colorHash))
+
+local fontBig = loadFont("RobotoMono-Bold", 150)
+local fontSmall = loadFont("RobotoMono", 75)
+
+function getColor(var)
+    return var[1]/255, var[2]/255, var[3]/255
+end
+
+local backR, backG, backB = getColor(standbyBackgroundColor)
+local textR, textG, textB = getColor(standbyTextColor)
+local strCenter = "RESTRICTED"
+local username = ""
+local t = 1
 
 if input ~= "" then
     local arguments = {}
-    for word in string.gmatch(input, "%w+") do
-        table.insert(arguments, word)
+    for word in string.gmatch(input, "([^,]+)") do
+        table.insert(arguments, word:match("^%s*(.-)%s*$"))
     end
 
-    local r,g,b = 0,1,0
-    local strCenter = "WELCOME"
-    local t = 1
-
-    if arguments[1] == "false" then
-        r,g,b = 1,0,0
+    if arguments[1] == "true" then
+        backR, backG, backB = getColor(knownBackgroundColor)
+        textR, textG, textB = getColor(knownTextColor)
+        strCenter = "WELCOME"
+        t = 1
+    elseif arguments[1] == "false" then
+        backR, backG, backB = getColor(unknownBackgroundColor)
+        textR, textG, textB = getColor(unknownTextColor)
         strCenter = "REFUSED"
         t = math.sin(time*10)/2+0.5
         requestAnimationFrame(1)
     end
 
-    local fontBig = loadFont("RobotoMono-Bold", 150)
-    local fontSmall = loadFont("RobotoMono", 75)
-    local border = 10
+    username = arguments[2]
+end
 
-    setBackgroundColor(r,g,b)
-    setDefaultFillColor(layer, Shape_Text, 0, 0, 0, 1)
-    setDefaultTextAlign(layer, AlignH_Center, AlignV_Middle)
-    setDefaultFillColor(layer, Shape_Box, 0, 0, 0, 1)
+setBackgroundColor(backR, backG, backB)
+setDefaultFillColor(layer, Shape_Text, textR, textG, textB, 1)
+setDefaultTextAlign(layer, AlignH_Center, AlignV_Middle)
+setDefaultFillColor(layer, Shape_Box, textR, textG, textB, 1)
 
-    -- Top Warning
-    local height = ry*0.1
+function drawLineText(text, font, height, lineWidth)
+    local border = 15
+    addBox(layer, 0, height-lineWidth/2, rx, lineWidth)
 
-    addBox(layer, 0, height-20, rx, 40)
-
-    local str = "WARNING"
-    local strWidth = getTextBounds(fontSmall, str)
-    setNextFillColor(layer, r,g,b, 1)
-    addBox(layer, rx/2-strWidth/2-border, height-20, strWidth+border*2, 40)
-    addText(layer, fontSmall, str, rx/2, height)
-
-    -- Middle Text
-    local height = ry*0.4
-    local strWidth, strHeight = getTextBounds(fontBig, strCenter)
-    setNextFillColor(layer, 0, 0, 0, t)
-    addText(layer, fontBig, strCenter, rx/2, height)
-
-    local left = createLayer()
-    setDefaultStrokeColor(left, Shape_Line, 0, 0, 0, 1)
-    setDefaultStrokeWidth(left, Shape_Line, 50)
-
-    setLayerClipRect(left, 0, 0, rx/2-strWidth/2-border, strHeight+border*2)
-    setLayerTranslation(left, 0, height-strHeight/2-border)
-
-    addLine(left, -50, 50, 50, -50)
-    addLine(left, -50, 50+150, 50+150, -50)
-    addLine(left, -50, 50+300, 50+300, -50)
-
-    local right = createLayer()
-    setDefaultStrokeColor(right, Shape_Line, 0, 0, 0, 1)
-    setDefaultStrokeWidth(right, Shape_Line, 50)
-
-    setLayerClipRect(right, rx/2+strWidth/2+border, 0, rx/2-strWidth/2-border, strHeight+border*2)
-    setLayerTranslation(right, 0, height-strHeight/2-border)
-
-    addLine(right, rx+50, 50, rx-50, -50)
-    addLine(right, rx+50, 50+150, rx-50-150, -50)
-    addLine(right, rx+50, 50+350, rx-50-350, -50)
-
-    -- Username
-    addBox(layer, 0, ry*0.65-4, rx, 8)
-    addText(layer, fontSmall, arguments[2], rx/2, ry*0.75)
-
-    -- Bottom Text
-    local height = ry*0.9
-
-    addBox(layer, 0, height-10, rx, 20)
-
-    local strWidth = getTextBounds(fontSmall, location)
-    setNextFillColor(layer, r,g,b, 1)
-    addBox(layer, rx/2-strWidth/2-border, height-10, strWidth+border*2, 20)
-    addText(layer, fontSmall, location, rx/2, height)
-else
-    local size = 100
-    local font = loadFont("RobotoMono-Bold", size)
-    local text = { "Restricted", "Area"}
-    for k,v in pairs(text) do
-        setNextTextAlign(layer, AlignH_Center, AlignV_Middle)
-        setNextFillColor(layer, 1, 1, 1, 1)
-        addText(layer, font, v, rx/2, ry/2 - ((#text-1)/2)*size + (k-1)*size)
+    if text ~= "" then
+        local strWidth = getTextBounds(font, text)
+        setNextFillColor(layer, backR, backG, backB, 1)
+        addBox(layer, rx/2-strWidth/2-border, height-lineWidth/2-5, strWidth+border*2, lineWidth+10)
+        addText(layer, font, text, rx/2, height)
     end
+end
+
+-- Top Warning
+drawLineText("WARNING", fontSmall, ry*0.1, 40)
+
+-- Bottom Location
+drawLineText(location, fontSmall, ry*0.9, 20)
+
+-- Middle Text
+local height = ry*0.4
+local strWidth, strHeight = getTextBounds(fontBig, strCenter)
+setNextFillColor(layer, textR, textG, textB, t)
+addText(layer, fontBig, strCenter, rx/2, height)
+if input == "" then
+    addText(layer, fontBig, "AREA", rx/2, ry*0.65)
+end
+
+-- Username
+if input ~= "" then
+    addBox(layer, 0, ry*0.65-4, rx, 8)
+    addText(layer, fontSmall, username, rx/2, ry*0.75)
 end

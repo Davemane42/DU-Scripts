@@ -1,7 +1,9 @@
-doorsState("close")
+if closestZone ~= nil then
+    doorsState(closestZone, "close")
 
-if #screens ~= 0 then
-    for k, screen in pairs(screens) do
-        screen.setScriptInput("")
+    if screens ~= 0 then
+        for k, v in pairs(screens) do
+            v.setScriptInput("")
+        end
     end
 end

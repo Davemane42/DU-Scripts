@@ -59,7 +59,9 @@ Dont forget to like on <a href="https://du-creators.org/makers/Davemane42/ship/P
 
 ![PlayerLogger](https://github.com/Davemane42/DU-Scripts/blob/master/images/RestrictedDoor.png?raw=true)
 
-Restric access to certain zones via "locked door"
+Restrict access to certain door via a white-list of Usernames or Organizations<br>
+multiple doors/screens close together create "zones" automaticly<br>
+User editable colors
 
 <details close="close">
   <summary>Instalation:</summary>
@@ -68,20 +70,26 @@ Restric access to certain zones via "locked door"
       <summary>Elements needed:</summary>
       <ul>
         <li>1x Programming board</li>
-	<li>1x Detection zone</li>
-	<li>1x Screen (minimum)</li>
-	  <ul><li>Supports multiple screens</li></ul>
+        <li>1x Detection zone</li>
+        <li>1x Door (minimum)</li>
+          <ul><li>Doors</li>
+          <li>Airlock</li>
+          <li>Gate</li>
+          <li>Forcefield</li></ul>
+        <li>optional screen(s)</li>
       </ul>
     </details>
     <li>Copy the content of this <a href="https://raw.githubusercontent.com/Davemane42/DU-Scripts/master/RestrictedAccessDoor/RestrictedAccessDoor.json">link</a></li>
       <ul><li>Right click (on the programming board) -> Advanced -> Paste Lua configuration from clipboard</li></ul>
     <li>Connect Detection zone -> Programming Board</li>
-    <li>Then Programming Board -> Door and Screen(s)</li>
+    <ul><li>Place it near the door(s)</li>
+    <li>For multiple Zones: add an "OR operator" between the Detection zones and the Programming board<br>only one operator needed between</li></ul>
+    <li>Then connect Programming board -> Door(s) and Screen(s)</li>
     <li>Finnaly, edit the lua parameters (Right click -> Advanced -> Edit Lua Parameters)
       </br>Add your username between the quotes ""
 	<ul><li>"Davemane42"</li></ul>
-      For multiple user. add comma , between names and no spaces
-	<ul><li>"Davemane42,User2,User3"</li></ul></li>
+      For multiple users add comma , between names
+	<ul><li>"Davemane42, User2, User3"</li></ul></li>
   </ul>
 </details>
 Dont forget to like on <a href="https://du-creators.org/makers/Davemane42/ship/Restricted%20Access%20Door">du-creators</a> 👍
