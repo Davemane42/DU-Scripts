@@ -34,8 +34,8 @@ end
 
 -- Load the first 100 entries of a logData to the screen input in 1000 characters chunks
 function loadScreenData()
-    comState = "load"
     if #logData > 0 then
+        comState = "load"
         local limit = math.min(100, #logData)
         loadBuffer = encodeLogData(limit)
 
@@ -165,7 +165,6 @@ end
 
 -- Update screen code if the version get changed
 function loadScreenCode()
-
     system.print("-----------------------------------------------")
     system.print(string.format("Updated screen version from %s to %s", dataBanks[1].getStringValue("screenVer"), version))
     system.print("-----------------------------------------------")
@@ -346,7 +345,7 @@ logData = loadData()
 playerData = database.getPlayer(player.getId())
 if knownUser ~= "" then
     for name in string.gmatch(knownUser, "([^,]+)") do
-        if playerData.name == name then
+        if playerData.name == name:match("^%s*(.-)%s*$") then
             known = true
         end
     end
@@ -358,7 +357,7 @@ if knownOrg ~= "" and #orgList>0 then
     for name in string.gmatch(knownOrg, "([^,]+)") do
         -- Look trough master player orgs
         for k, v in pairs(orgList) do
-            if database.getOrganization(v).name == name then
+            if database.getOrganization(v).name == name:match("^%s*(.-)%s*$") then
                 known = true
             end
         end
@@ -387,17 +386,22 @@ if (known and ignoreKnown) == false then
             table.remove(logData, 1)
         elseif mergeLastDay then
             local limit = #logData > mergeLastDayCount and mergeLastDayCount or #logData
+            local currentTimeString = string.match(getTime(), '([%d/]+)')
             local pastTimeString = string.match(getTime(-24), '([%d/]+)')
+            system.print(pastTimeString)
             for i=1, limit do
-                if playerData.id == logData[i][2] then
-                    local timeString = string.match(logData[i][3], '([%d/]+)')
-                    if timeString == pastTimeString then
+                local timeString = string.match(logData[i][3], '([%d/]+)')
+                if timeString == currentTimeString or timeString == pastTimeString then
+                    if playerData.id == logData[i][2] then
                         system.print(string.format("Deleting past entry of %s from %s", logData[i][1], timeString))
                         table.remove(logData, i)
                         break
                     end
+                else
+                    break
                 end
             end
+            system.print(count)
         end
     end
 
