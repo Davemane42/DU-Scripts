@@ -8,7 +8,7 @@ knownOrg = "" --export <p style="font-size:150%;">ex: "The Prospectors,Org Name2
 
 zoneRadius = 5 --export <p style="font-size:150%;">Maximum radius of a zone in meters</p><br><p style="font-size:150%; color:green;">Default: 5</p>
 activationDistance = 25 --export <p style="font-size:150%;">Maximum distance to activate a zone in meters</p><br><p style="font-size:150%; color:green;">Default: 25</p>
-sigleZone = false --export <p style="font-size:150%;">All elements are in a single zone</p><br><p style="font-size:150%; color:green;">Default: false</p>
+singleZone = false --export <p style="font-size:150%;">All elements are in a single zone</p><br><p style="font-size:150%; color:green;">Default: false</p>
 
 standbyTextColor = "192, 203, 220" --export <p style="font-size:150%; color:rgb(192, 203, 220);">Default: "192, 203, 220"<p><p style="font-size:150%; color:red;">Keep R,G,B between quotes ""</p>
 standbyBackgroundColor = "24, 20, 37" --export <p style="font-size:150%; background-color:rgb(24, 20, 37);">Default: "24, 20, 37"<p><p style="font-size:150%; color:red;">Keep R,G,B between quotes ""</p>
@@ -102,7 +102,7 @@ function doorsState(zone, state)
     end
 end
 
-if not sigleZone then
+if not singleZone then
     -- Group doors/screen into zones
     table.sort(doors, function(a,b) return a.slotname < b.slotname end)
 
