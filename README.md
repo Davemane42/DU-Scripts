@@ -76,20 +76,24 @@ User editable colors
           <li>Airlock</li>
           <li>Gate</li>
           <li>Forcefield</li></ul>
-        <li>optional screen(s)</li>
+        <li>Screen(s) (optional)</li>
+        <li>1x Manual Switch (optional)</li>
       </ul>
     </details>
     <li>Copy the content of this <a href="https://raw.githubusercontent.com/Davemane42/DU-Scripts/master/RestrictedAccessDoor/RestrictedAccessDoor.json">link</a></li>
       <ul><li>Right click (on the programming board) -> Advanced -> Paste Lua configuration from clipboard</li></ul>
     <li>Connect Detection zone -> Programming Board</li>
     <ul><li>Place it near the door(s)</li>
-    <li>For multiple Zones: add an "OR operator" between the Detection zones and the Programming board<br>only one operator needed between</li></ul>
+    <li>For multiple Zones: add an "OR operator" between the Detection zones and the Programming board<br>only one "OR operator" needed between</li></ul>
     <li>Then connect Programming board -> Door(s) and Screen(s)</li>
     <li>Finnaly, edit the lua parameters (Right click -> Advanced -> Edit Lua Parameters)
       </br>Add your username between the quotes ""
 	<ul><li>"Davemane42"</li></ul>
       For multiple users add comma , between names
 	<ul><li>"Davemane42, User2, User3"</li></ul></li>
+  <li>To add a global lockdown switch, connect the Programming board -> Manual Switch
+    </br>The lockdown will be triggered next activation.
+  </li>
   </ul>
 </details>
 Dont forget to like on <a href="https://du-creators.org/makers/Davemane42/ship/Restricted%20Access%20Door">du-creators</a> 👍

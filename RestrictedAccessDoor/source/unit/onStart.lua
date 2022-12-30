@@ -7,6 +7,8 @@ knownUser = "" --export <p style="font-size:150%;">ex: "Davemane42,User2"</p><p 
 knownOrg = "" --export <p style="font-size:150%;">ex: "The Prospectors,Org Name2"</p><p style="font-size:150%; color:red";">Keep the list between quotes ""</p>
 
 zoneRadius = 5 --export <p style="font-size:150%;">Maximum radius of a zone in meters</p><br><p style="font-size:150%; color:green;">Default: 5</p>
+activationDistance = 25 --export <p style="font-size:150%;">Maximum distance to activate a zone in meters</p><br><p style="font-size:150%; color:green;">Default: 25</p>
+sigleZone = false --export <p style="font-size:150%;">All elements are in a single zone</p><br><p style="font-size:150%; color:green;">Default: false</p>
 
 standbyTextColor = "192, 203, 220" --export <p style="font-size:150%; color:rgb(192, 203, 220);">Default: "192, 203, 220"<p><p style="font-size:150%; color:red;">Keep R,G,B between quotes ""</p>
 standbyBackgroundColor = "24, 20, 37" --export <p style="font-size:150%; background-color:rgb(24, 20, 37);">Default: "24, 20, 37"<p><p style="font-size:150%; color:red;">Keep R,G,B between quotes ""</p>
@@ -31,10 +33,12 @@ updateScreens = false --export <p style="font-size:150%;">Update screens</p><br>
 
 playerData = database.getPlayer(player.getId())
 known = false
+globalLockdown = false
 
 -- Loop trough slots and get the screen(s) and door(s)
 screens = {}
 doors = {}
+switches = {}
 for slot_name, slot in pairs(unit) do
     if type(slot) == "table" and type(slot.export) == "table" and slot.getClass then
         local elementClass = slot.getClass():lower()
@@ -48,6 +52,8 @@ for slot_name, slot in pairs(unit) do
             table.insert(screens, slot)
         elseif elementClass:find("door") or elementClass == "airlock" or elementClass == "gate" or elementClass == "forcefieldunit" then
             table.insert(doors, slot)
+        elseif elementClass == "manualswitchunit" then
+            table.insert(switches, slot)
         end
     end
 end
@@ -56,33 +62,12 @@ if #doors == 0 then
     unit.exit()
     return
 end
-
-table.sort(doors, function(a,b) return a.slotname < b.slotname end)
-
--- Group doors/screen into zones
-zones = {}
-for k, v in pairs(doors) do
-    if v.zone == nil then
-        zoneID = #zones+1
-        doors[k].zone = zoneID
-        zones[zoneID] = {["door"]={k}, ["screen"]={}, ["position"]=v.position, ["name"]=zoneName[zoneID] or ""}
-        local elementClass = v.getClass():lower()
-        local id = v.getItemId()
-
-        for kk, vv in pairs(doors) do
-            local valid = false
-            if vv.getItemId() == id then valid=true end
-            if vv.getClass():lower() ~= elementClass then valid=false end
-
-            if kk ~= k and valid then
-                if vv.zone == nil and v.position.dist(v.position, vv.position) < zoneRadius then
-                    doors[kk].zone = zoneID
-                    table.insert(zones[zoneID]["door"], kk)
-                end
-            end
-        end
+if #switches ~= 0 then
+    if switches[1].isActive() == 1 then
+        globalLockdown = true
     end
 end
+if globalLockdown then system.print("lockdown") end
 
 function getClosestZone(pos, max)
     local max = max or 999
@@ -97,15 +82,86 @@ function getClosestZone(pos, max)
     return closest[1]
 end
 
-closestZone = getClosestZone(vec3.new(player.getPosition()), 25)
-
-if #screens ~= 0 then
-    for k, v in pairs(screens) do
-        local closest = getClosestZone(v.position)
-        if closest ~= nil then
-            table.insert(zones[closest]["screen"], k)
+function doorsState(zone, state)
+    for k, v in pairs(zones[zone]["door"]) do
+        door = doors[v]
+        local elementClass = door.getClass():lower()
+        if state == "open" then
+            if elementClass == "forcefieldunit" then
+                door.retract()
+            else
+                door.open()
+            end
+        elseif state == "close" then
+            if elementClass == "forcefieldunit" then
+                door.deploy()
+            else
+                door.close()
+            end
         end
     end
+end
+
+if not sigleZone then
+    -- Group doors/screen into zones
+    table.sort(doors, function(a,b) return a.slotname < b.slotname end)
+
+    zones = {}
+    for k, v in pairs(doors) do
+        if v.zone == nil then
+            zoneID = #zones+1
+            doors[k].zone = zoneID
+            zones[zoneID] = {["door"]={k}, ["screen"]={}, ["position"]=v.position, ["name"]=zoneName[zoneID] or ""}
+            local elementClass = v.getClass():lower()
+            local id = v.getItemId()
+
+            for kk, vv in pairs(doors) do
+                local valid = false
+                if vv.getItemId() == id then valid=true end
+                if vv.getClass():lower() ~= elementClass then valid=false end
+
+                if kk ~= k and valid then
+                    if vv.zone == nil and v.position.dist(v.position, vv.position) < zoneRadius then
+                        doors[kk].zone = zoneID
+                        table.insert(zones[zoneID]["door"], kk)
+                    end
+                end
+            end
+        end
+    end
+
+    closestZone = getClosestZone(vec3.new(player.getPosition()), activationRadius)
+
+    if #screens ~= 0 then
+        for k, v in pairs(screens) do
+            local closest = getClosestZone(v.position)
+            if closest ~= nil then
+                table.insert(zones[closest]["screen"], k)
+            end
+        end
+    end
+
+    for k, v in pairs(zones) do
+        doorsState(k, "close")
+    end
+    if screens ~= 0 then
+        for k, v in pairs(screens) do
+            v.setScriptInput("")
+        end
+    end
+else
+    -- Single Zone
+    zones = {{["door"]={k}, ["screen"]={}, ["name"]=zoneName[1] or ""}}
+    for k, v in pairs(doors) do
+        doors[k].zone = 1
+        table.insert(zones[1]["door"], k)
+    end
+    if #screens ~= 0 then
+        for k, v in pairs(screens) do
+            table.insert(zones[1]["screen"], k)
+        end
+    end
+    closestZone = 1
 end
 
 local colorHash = 0
@@ -113,7 +169,7 @@ local str = string.format("%s,%s,%s,%s,%s,%s",standbyTextColor, standbyBackgroun
 for x in string.gmatch(str, "([^,]+)") do colorHash = colorHash+tonumber(x) end
 
 -- Update screens if necessary
-local version = "2.0"
+local version = "2.1"
 for k, v in pairs(zones) do
     if #v["screen"] ~= 0 then
         for kk, vv in pairs(v["screen"]) do
@@ -151,7 +207,6 @@ knownBackgroundColor,
 unknownTextColor,
 unknownBackgroundColor)..[[
 
-
 setOutput(string.format("%s %s %s", version, location, colorHash))
 
 local fontBig = loadFont("RobotoMono-Bold", 150)
@@ -166,6 +221,7 @@ local textR, textG, textB = getColor(standbyTextColor)
 local strCenter = "RESTRICTED"
 local username = ""
 local t = 1
+local lockdown = false
 
 if input ~= "" then
     local arguments = {}
@@ -178,15 +234,24 @@ if input ~= "" then
         textR, textG, textB = getColor(knownTextColor)
         strCenter = "WELCOME"
         t = 1
+        username = arguments[2]
     elseif arguments[1] == "false" then
         backR, backG, backB = getColor(unknownBackgroundColor)
         textR, textG, textB = getColor(unknownTextColor)
         strCenter = "REFUSED"
         t = math.sin(time*10)/2+0.5
         requestAnimationFrame(1)
-    end
+        username = arguments[2]
+    elseif arguments[1] == "lockdown" then
+        backR, backG, backB = getColor(unknownBackgroundColor)
+        textR, textG, textB = getColor(unknownTextColor)
+        strCenter = "LOCKDOWN"
+        username = ""
+        t = math.sin(time*10)/2+0.5
+        requestAnimationFrame(1)
 
-    username = arguments[2]
+        lockdown = true
+    end
 end
 
 setBackgroundColor(backR, backG, backB)
@@ -213,7 +278,12 @@ drawLineText("WARNING", fontSmall, ry*0.1, 40)
 drawLineText(location, fontSmall, ry*0.9, 20)
 
 -- Middle Text
-local height = ry*0.4
+if lockdown then
+    height = ry*0.5
+else
+    height = ry*0.4
+end
+
 local strWidth, strHeight = getTextBounds(fontBig, strCenter)
 setNextFillColor(layer, textR, textG, textB, t)
 addText(layer, fontBig, strCenter, rx/2, height)
@@ -222,7 +292,7 @@ if input == "" then
 end
 
 -- Username
-if input ~= "" then
+if username ~= "" then
     addBox(layer, 0, ry*0.65-4, rx, 8)
     addText(layer, fontSmall, username, rx/2, ry*0.75)
 end
@@ -254,35 +324,29 @@ if knownOrg ~= "" and #orgList>0 then
     end
 end
 
-function doorsState(zone, state)
-    for k, v in pairs(zones[zone]["door"]) do
-        door = doors[v]
-        local elementClass = door.getClass():lower()
-        if state == "open" then
-            if elementClass == "forcefieldunit" then
-                door.retract()
-            else
-                door.open()
-            end
-        elseif state == "close" then
-            if elementClass == "forcefieldunit" then
-                door.deploy()
-            else
-                door.close()
+if globalLockdown then
+    for k, v in pairs(zones) do
+        for kk, vv in pairs(v["door"]) do
+            doorsState(k, "lockdown")
+        end
+        if #v["screen"] ~= 0 then
+            for kk, vv in pairs(v["screen"]) do
+                screens[vv].setScriptInput("lockdown")
             end
         end
     end
-    if #zones[zone]["screen"] ~= 0 then
-        for k, v in pairs(zones[zone]["screen"]) do
-            screens[v].setScriptInput(string.format("%s,%s", known, playerData.name))
+else
+    if closestZone ~= nil then
+        if known then
+            doorsState(closestZone, "open")
+        else
+            doorsState(closestZone, "close")
         end
-    end
-end
 
-if closestZone ~= nil then
-    if known then
-        doorsState(closestZone, "open")
-    else
-        doorsState(closestZone, "close")
+        if #zones[closestZone]["screen"] ~= 0 then
+            for k, v in pairs(zones[closestZone]["screen"]) do
+                screens[v].setScriptInput(string.format("%s,%s", known, playerData.name))
+            end
+        end
     end
 end

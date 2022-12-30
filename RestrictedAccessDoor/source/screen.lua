@@ -3,8 +3,8 @@ local rx, ry = getResolution()
 local time = getTime()
 local input = getInput()
 
-local version = "2.0"
-local location = ""
+local version = "2.1"
+local location = "ZONE 1"
 local colorHash = 2262
 local standbyTextColor = {192, 203, 220}
 local standbyBackgroundColor = {24, 20, 37}
@@ -12,7 +12,6 @@ local knownTextColor = {192, 203, 220}
 local knownBackgroundColor = {24, 20, 37}
 local unknownTextColor = {192, 203, 220}
 local unknownBackgroundColor = {255, 0, 0}
-
 setOutput(string.format("%s %s %s", version, location, colorHash))
 
 local fontBig = loadFont("RobotoMono-Bold", 150)
@@ -27,6 +26,7 @@ local textR, textG, textB = getColor(standbyTextColor)
 local strCenter = "RESTRICTED"
 local username = ""
 local t = 1
+local lockdown = false
 
 if input ~= "" then
     local arguments = {}
@@ -39,15 +39,24 @@ if input ~= "" then
         textR, textG, textB = getColor(knownTextColor)
         strCenter = "WELCOME"
         t = 1
+        username = arguments[2]
     elseif arguments[1] == "false" then
         backR, backG, backB = getColor(unknownBackgroundColor)
         textR, textG, textB = getColor(unknownTextColor)
         strCenter = "REFUSED"
         t = math.sin(time*10)/2+0.5
         requestAnimationFrame(1)
-    end
+        username = arguments[2]
+    elseif arguments[1] == "lockdown" then
+        backR, backG, backB = getColor(unknownBackgroundColor)
+        textR, textG, textB = getColor(unknownTextColor)
+        strCenter = "LOCKDOWN"
+        username = ""
+        t = math.sin(time*10)/2+0.5
+        requestAnimationFrame(1)
 
-    username = arguments[2]
+        lockdown = true
+    end
 end
 
 setBackgroundColor(backR, backG, backB)
@@ -74,7 +83,12 @@ drawLineText("WARNING", fontSmall, ry*0.1, 40)
 drawLineText(location, fontSmall, ry*0.9, 20)
 
 -- Middle Text
-local height = ry*0.4
+if lockdown then
+    height = ry*0.5
+else
+    height = ry*0.4
+end
+
 local strWidth, strHeight = getTextBounds(fontBig, strCenter)
 setNextFillColor(layer, textR, textG, textB, t)
 addText(layer, fontBig, strCenter, rx/2, height)
@@ -83,7 +97,7 @@ if input == "" then
 end
 
 -- Username
-if input ~= "" then
+if username ~= "" then
     addBox(layer, 0, ry*0.65-4, rx, 8)
     addText(layer, fontSmall, username, rx/2, ry*0.75)
 end

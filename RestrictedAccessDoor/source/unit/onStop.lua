@@ -3,7 +3,11 @@ if closestZone ~= nil then
 
     if screens ~= 0 then
         for k, v in pairs(screens) do
-            v.setScriptInput("")
+            if globalLockdown then
+                v.setScriptInput("lockdown")
+            else
+                v.setScriptInput("")
+            end
         end
     end
 end
