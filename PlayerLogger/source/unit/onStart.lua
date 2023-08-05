@@ -99,7 +99,7 @@ function loadData()
     local buffer = ""
     for k,v in pairs(dataBanks) do
         -- Import old data from before v3.0
-        if v.hasKey("latest") == 1 then
+        if v.hasKey("latest") == true then
             buffer = v.getStringValue("latest")
             v.clear()
             if k == 1 then
@@ -109,7 +109,7 @@ function loadData()
             break
         end
 
-        if v.hasKey("logData") == 1 then
+        if v.hasKey("logData") == true then
             buffer = buffer..v.getStringValue("logData")
         end
     end
